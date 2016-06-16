@@ -1,6 +1,7 @@
 *, div, p {
   box-sizing: border-box;
-  margin: 0; padding: 0;
+  margin: 0; 
+  padding: 0;
 }
 
 .r-editor {
@@ -19,6 +20,7 @@
     .r-preview {
       width: 100%;
       height: 196px;
+      padding: 5px;
     }
 
     .r-content {
@@ -38,7 +40,6 @@
 
     .r-preview {
       position: absolute;
-      overflow: scroll;
       right: 0px;
       top: 0px;
       width: 50%;
@@ -121,7 +122,8 @@
   .r-preview {
     display: none;
     border: 1px solid #ccc;
-    background-color: antiquewhite;
+    //background-color: antiquewhite;
+    overflow: scroll;
   }
 
   .r-split-bar {
@@ -148,8 +150,9 @@
       font-size: 14px;
       padding: 10px;
       outline: none;
+      resize: none;
     }  
-  }
-
-  
+  } 
 }
+
+@import 'markdown.less';

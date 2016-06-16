@@ -3,6 +3,43 @@ import { connect } from 'react-redux'
 import { render } from '../src/markdown'
 import _ from 'lodash';
 
+const code = '```';
+const placeholder = `# 제일 큰 제목  H1
+## 두번재 제목
+### 세번째 제목
+#### 네번째 제목
+##### 다섯번째 제목
+###### 여섯번째 제목
+
+## 리스트 
+- 리스트 1
+- 리스트 2
+ - 하위 리스트 1
+ - 하위 리스트 2
+
+## 링크 
+- 이렇게 거는 방법이 있어 [이건 지도](http://naver.com) 
+- [이렇게 거는 방법도 있지][1]
+ 
+[1]:http://rlibro.com
+
+## 지도 삽입
+일단 저걸 눌러!
+
+## 자동 저장 
+이거 자동 저장 되는거 아니?
+
+## 코드 삽입
+${code}
+혹시 코드를 넣을 일이 있나? 
+${code}
+## 인용구 
+> 인용은 이렇게 하는거야!
+이게 됐지?
+
+## 그밖에
+`;
+
 export default class RlibroEditor extends Component {
 
   static propTypes = {
@@ -12,7 +49,7 @@ export default class RlibroEditor extends Component {
     super(props);
     this.state = {
       preview: 0,
-      html: ''
+      text: placeholder
     }
   }
 
@@ -35,7 +72,8 @@ export default class RlibroEditor extends Component {
   }
 
   render() {
-    const { html, preview } = this.state;
+    const { text, preview, defaultValue } = this.state;
+    const html = render(text); 
 
     let klassName = 'r-editor'
     if( preview === 1 ) {
@@ -57,7 +95,7 @@ export default class RlibroEditor extends Component {
           </a>
         </div>
         <div className="r-toolbar">
-          <a className="btn">Clear</a>
+          <a className="btn" onClick={this.handleClear}>Clear</a>
           <a className="btn" onClick={this.handleTogglePreview}>Preview</a>
         </div>
       </div>
@@ -68,7 +106,7 @@ export default class RlibroEditor extends Component {
         <div className="r-split-bar" />
 
         <div className="r-content">
-          <textarea ref="textarea" onChange={this.handleChange} />
+          <textarea ref="textarea" onChange={this.handleChange} value={text} />
         </div>
       </div>
     </div>
@@ -76,7 +114,7 @@ export default class RlibroEditor extends Component {
 
   handleChange =(e)=>{
     this.setState({
-      html: render(e.target.value) 
+      text: e.target.value
     })
   };
 
@@ -93,5 +131,9 @@ export default class RlibroEditor extends Component {
     this.setState({ preview: preview })
 
   };
+
+  handleClear = (e) => {
+    this.setState({ text:'', html: ''})
+  }
 
 };
