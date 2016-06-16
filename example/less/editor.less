@@ -1,0 +1,34 @@
+* {
+  box-sizing: border-box;
+}
+
+.r-editor {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  padding: 10px;
+
+  .r-preview {
+    border: 1px solid #ccc;
+    width: 100%;
+    height: 200px;
+    background-color: antiquewhite;
+  }
+
+  .r-split-bar {
+    background-color: #ccc;
+    height: 5px;
+    cursor: pointer;
+    margin: 2px 0;
+
+    &:hover {
+      background-color: #222;
+      height: 5px;
+    }
+  }
+
+  textarea {
+    border-color: #ccc;
+    width: 100%;
+    height: 200px;
+  }
+}

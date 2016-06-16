@@ -1,3 +1,5 @@
+import './less/editor.less';
+
 import React from 'react';
 import ReactDOM from 'react-dom';
 import RlibroEditor from './src/RlibroEditor';
