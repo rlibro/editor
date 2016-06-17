@@ -3,6 +3,7 @@ import { connect } from 'react-redux'
 import { render } from '../src/markdown'
 import _ from 'lodash';
 
+const PREWVIEW_NONE = 0, PREWVIEW_TOP=1, PREWVIEW_RIGHT = 2, SPLITBAR = 8, HEADER = 40;
 const code = '```';
 const placeholder = `# 제일 큰 제목  H1
 ## 두번재 제목
@@ -37,8 +38,7 @@ ${code}
 > 인용은 이렇게 하는거야!
 이게 됐지?
 
-## 그밖에
-`;
+## 그밖에`;
 
 export default class RlibroEditor extends Component {
 
@@ -48,7 +48,7 @@ export default class RlibroEditor extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      preview: 0,
+      preview: PREWVIEW_RIGHT,
       text: placeholder
     }
   }
@@ -65,26 +65,38 @@ export default class RlibroEditor extends Component {
   componentDidUpdate(prevProps, prevState) {
   }
 
-  // shouldComponentUpdate(nextProps, nextState) {
-  // }
+  shouldComponentUpdate(nextProps, nextState) {
+    return true;
+  }
 
   componentWillUnmount() {
   }
 
   render() {
-    const { text, preview, defaultValue } = this.state;
+    const { text, preview } = this.state;
     const html = render(text); 
+    const { width, height } = this.props;
 
-    let klassName = 'r-editor'
-    if( preview === 1 ) {
-      klassName += '  preview-on position-top'
+    let klassName = 'r-editor';
+    if( preview === PREWVIEW_TOP ) {
+      klassName += '  preview-on position-top';
     } 
 
-    if( preview === 2 ) {
+    if( preview === PREWVIEW_RIGHT ) {
       klassName += '  preview-on position-right';
     }
 
-    return <div className={klassName}>
+    let style = {}, wrapStyle = {};     
+    if( width ) {
+      style.width = `${width}px`;
+    }
+    if( height ) {
+      style.height = `${height}px`;
+      wrapStyle.height = `${ height - HEADER }px`;
+    }
+
+
+    return <div className={klassName} style={style}>
       <div className="r-header">
         <div className="r-help">
           <a href="https://guides.github.com/features/mastering-markdown/" target="_blank" data-ga-click="Markdown Toolbar, click, help">
@@ -95,22 +107,114 @@ export default class RlibroEditor extends Component {
           </a>
         </div>
         <div className="r-toolbar">
-          <a className="btn" onClick={this.handleClear}>Clear</a>
-          <a className="btn" onClick={this.handleTogglePreview}>Preview</a>
+          <button className="btn" onClick={this.handleClear}>Clear</button>
+          <button className="btn" onClick={this.handleTogglePreview}>Preview</button>
         </div>
       </div>
 
-      <div className="r-wrap">
-        <div className="r-preview" dangerouslySetInnerHTML={{__html: html}}></div>
-
-        <div className="r-split-bar" />
-
-        <div className="r-content">
-          <textarea ref="textarea" onChange={this.handleChange} value={text} />
-        </div>
+      <div className="r-wrap" style={wrapStyle}>
+        {this.renderPreview()}
+        {this.renderSplitBar()}
+        {this.renderContent()}
+        
       </div>
     </div>
   }
+
+  renderPreview = () => {
+    const { preview, text } = this.state;
+    const html = render(text); 
+
+    let { width, height } = this.props;
+    let style = {}
+
+    height = height - HEADER;
+
+    if( preview === PREWVIEW_TOP ){
+      if( width ) {
+        style.width = `${width}px`;
+      }
+      if( height ) {
+        style.height = `${height/2 - (SPLITBAR/2)}px`;
+      }
+    }
+
+    if( preview === PREWVIEW_RIGHT ){
+      if( width ) {
+        style.width = `${width/2 - (SPLITBAR/2)}px`;
+      }
+      if( height ) {
+        style.height = `${height}px`;
+      }
+    }
+
+
+    return <div className="r-preview" style={style} dangerouslySetInnerHTML={{__html: html}}></div>
+  };
+
+  renderSplitBar = () => {
+    const { preview } = this.state;
+    const { width, height } = this.props;
+
+    let style = {}
+    if( preview === PREWVIEW_TOP ){
+      style.left = width/2 - 2;
+      if( height ) {
+        style.height = '4px';
+      }
+    }
+
+    if( preview === PREWVIEW_RIGHT ){
+      style.left = width/2 - 2;
+      style.width = '4px';
+      if( height ) {
+        style.height = `${height-HEADER}px`;
+      }
+    }
+    return <div className="r-split-bar" style={style} />
+  };
+
+  renderContent = () => {
+    const { text, preview } = this.state;
+    
+    let { width, height } = this.props;
+    let style = {}
+    
+    height = height - HEADER;
+
+    if( preview === PREWVIEW_NONE ){
+      if( width ) {
+        style.width = `${width-2}px`;
+      }
+      if( height ) {
+        style.height = `${height-6}px`;
+      }
+    }
+
+    if( preview === PREWVIEW_TOP ){
+      if( width ) {
+        style.width = `${width-2}px`;
+      }
+      if( height ) {
+        style.height = `${height/2-SPLITBAR-(SPLITBAR/2)}px`;
+      }
+    }
+
+    if( preview === PREWVIEW_RIGHT ){
+      if( width ) {
+        style.width = `${width/2- (SPLITBAR/2) - 2}px`;
+      }
+      if( height ) {
+        style.height = `${height-6}px`;
+      }
+    }
+
+    return (
+      <div className="r-content">
+        <textarea style={style} ref="textarea" onChange={this.handleChange} value={text} />
+      </div>
+    );
+  };
 
   handleChange =(e)=>{
     this.setState({
